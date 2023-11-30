@@ -82,23 +82,38 @@ class LogInScreen  extends StatelessWidget {
                     onChanged: (value) => controller.setPassword = value,
                   ),
                   const SizedBox(height: 25,),
-                  TextButton(
-                    onPressed: () => controller.onLogIn(),
-                    style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(const Color(0xFF670F0F)),
-                      backgroundColor: MaterialStateProperty.all(const Color(0xFFFF5454)),
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0))),
-                      fixedSize: MaterialStateProperty.all(const Size(400, 54)),
-                    ), 
-                    child: const Text(
-                      'Inciar Sesión',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        fontFamily: FontFamilyToken.montserrat
-                      ),
-                    ),
+                  GetBuilder<LogInController>(
+                    id: 'loading',
+                    builder: (_) {
+                      return TextButton(
+                        onPressed: () async {
+                          controller.onLogin();
+                        },
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateProperty.all(const Color(0xFF670F0F)),
+                          backgroundColor: MaterialStateProperty.all(const Color(0xFFFF5454)),
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0))),
+                          fixedSize: MaterialStateProperty.all(const Size(400, 54)),
+                        ), 
+                        child: controller.loading == false ? const Text(
+                          'Iniciar Sesión',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontFamily: FontFamilyToken.montserrat
+                          ),
+                        ):
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            backgroundColor: Color(0xFF670F0F),
+                          ),
+                        ),
+                      );
+                    }
                   ),
                   const SizedBox(height: 60,),
                   Row(
@@ -126,7 +141,6 @@ class LogInScreen  extends StatelessWidget {
                               fontSize: 14,
                               color: Color(0xFFFF5454),
                               fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline
                             ),
                           ),
                         ),

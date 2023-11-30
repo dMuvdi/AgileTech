@@ -154,23 +154,38 @@ class SignUpScreen  extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 25,),
-                  TextButton(
-                    onPressed: () => controller.onSignUp(),
-                    style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(const Color(0xFF670F0F)),
-                      backgroundColor: MaterialStateProperty.all(const Color(0xFFFF5454)),
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0))),
-                      fixedSize: MaterialStateProperty.all(const Size(400, 54)),
-                    ), 
-                    child: const Text(
-                      'Registrarse',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        fontFamily: FontFamilyToken.montserrat
-                      ),
-                    ),
+                  GetBuilder<SignUpController>(
+                    id: 'loading',
+                    builder: (context) {
+                      return TextButton(
+                        onPressed: () async {
+                          await controller.onSignUp();
+                        },
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateProperty.all(const Color(0xFF670F0F)),
+                          backgroundColor: MaterialStateProperty.all(const Color(0xFFFF5454)),
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0))),
+                          fixedSize: MaterialStateProperty.all(const Size(400, 54)),
+                        ), 
+                        child: controller.loading == false ? const Text(
+                          'Registrarse',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontFamily: FontFamilyToken.montserrat
+                          ),
+                        ):
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            backgroundColor: Color(0xFF670F0F),
+                          ),
+                        ),
+                      );
+                    }
                   ),
                   const SizedBox(height: 60,),
                   Row(
@@ -188,7 +203,7 @@ class SignUpScreen  extends StatelessWidget {
                       GestureDetector(
                         onTap: () => controller.goToLogIn(),
                         child: Container(
-                          width: 95,
+                          width: 100,
                           height: 20,
                           color: Colors.transparent,
                           child: const Text(
@@ -198,7 +213,6 @@ class SignUpScreen  extends StatelessWidget {
                               fontSize: 14,
                               color: Color(0xFFFF5454),
                               fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline
                             ),
                           ),
                         ),

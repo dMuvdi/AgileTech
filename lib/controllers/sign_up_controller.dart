@@ -1,10 +1,26 @@
+import 'package:agile_tech/models/user.dart';
 import 'package:agile_tech/screens/login_screen.dart';
+import 'package:agile_tech/services/graphql_config.dart';
+import 'package:agile_tech/utils/gen/fonts.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../screens/bottom_navigation.dart';
+
+enum UserRole {
+  admin,
+  client,
+  technician,
+}
 
 class SignUpController extends GetxController {
 
   final formKey = GlobalKey<FormState>();
+
+  static GraphQLConfig graphQLConfig = GraphQLConfig();
+  GraphQLClient client = graphQLConfig.clientToQuery();
 
   //List of roles
   final List<String> _dropdownItems = ['Administrador', 'Cliente', 'Técnico'];
@@ -14,12 +30,23 @@ class SignUpController extends GetxController {
   String? _email;
   String? _password;
   final RxString currentRole = 'Cliente'.obs;
+  bool loading = false;
   
   String? get name => _name;
   String? get lastName => _lastName;
   String? get email => _email;
   String? get password => _password;
   List<String> get dropdownItems => _dropdownItems;
+
+  String get role {
+    switch(currentRole.value){
+      case "Administrador":
+        return "ADMIN";
+      case "Técnico":
+        return "TECHNICIAN";
+    }
+    return "CLIENT";
+  }
 
   set setName(String value){
     _name = value;
@@ -36,19 +63,19 @@ class SignUpController extends GetxController {
   set setPassword(String pwd){
     _password = pwd;
   }
-  
-  @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
-  }
-  
-  @override
-  // TODO: implement onDelete
-  InternalFinalCallback<void> get onDelete => super.onDelete;
 
   void updateDropdownItem(String value){
     currentRole.value = value;
+  }
+
+  void isLoading(){
+    loading = true;
+    update(['loading']);
+  }
+
+  void isNotLoading(){
+    loading = false;
+    update(['loading']);
   }
 
   validateNameAndLastName(String? value){
@@ -86,23 +113,86 @@ class SignUpController extends GetxController {
     Get.off(() => const LogInScreen(), transition: Transition.leftToRight);
   }
 
-  onSignUp() async {
+  storeToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+  }
+
+  storeUser(String name, String lastName, String role) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', name);
+    await prefs.setString('lastName', lastName);
+    await prefs.setString('role', role);
+  }
+
+  Future<void> onSignUp() async {
     if(formKey.currentState!.validate()){
-      Get.snackbar(
-        "Success",
-        "${_name}, ${_lastName}, ${currentRole}, ${_email}, ${_password}",
-        snackPosition: SnackPosition.BOTTOM,
-        padding: const EdgeInsets.all(10),
+      isLoading();
+      final MutationOptions options = MutationOptions(
+        fetchPolicy: FetchPolicy.noCache,
+        document: gql("""
+            mutation Signup(\$name: String!, \$lastName: String!, \$email: String!, \$password: String!, \$role: UserRole!) {
+              signup(signupInput: {
+                name: \$name,
+                lastName: \$lastName,
+                email: \$email,
+                password: \$password,
+                role: \$role
+              }) {
+                token
+                user {
+                  name
+                  lastName
+                  role
+                }
+              }
+            }
+      """),
+      variables: {
+          'name': _name,
+          'lastName': _lastName,
+          'email': _email,
+          'password': _password,
+          'role': role
+        },
       );
-      return;
-    } else {
-      Get.snackbar(
-        "Error",
-        "Error",
-        snackPosition: SnackPosition.BOTTOM,
-        padding: const EdgeInsets.all(10),
-      );
-      return;
+
+      final QueryResult result = await client.mutate(options);
+
+      if(result.data == null){
+        showDialog(
+          context: Get.context!, 
+          builder: (context){
+            return const SimpleDialog(
+              backgroundColor:Color(0xFFFFE1E1),
+              title: Text(
+                "Error de registro", 
+                style: TextStyle(
+                  color: Color(0xFF670F0F), 
+                  fontFamily: FontFamilyToken.montserrat, 
+                  fontSize: 20),
+                ),
+              children: [
+                Text(
+                  "Este email ya está en uso por favor ingrese uno diferente", 
+                  style: TextStyle(
+                    color: Color(0xFF670F0F), 
+                    fontFamily: FontFamilyToken.montserrat,
+                     fontSize: 14),
+                )
+              ],
+            );
+          }
+        );
+      } else {
+        String? token = result.data!['signup']['token'];
+        User user = User.fromMap(map: result.data!['signup']['user']);
+        storeUser(user.name, user.lastName, user.role);
+        print(token);
+        storeToken(token!);
+        isNotLoading();
+        Get.off(const BottomNavigation());
+      }
     }
   }
 }
