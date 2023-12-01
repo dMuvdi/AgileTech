@@ -9,18 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/bottom_navigation.dart';
 
-enum UserRole {
-  admin,
-  client,
-  technician,
-}
-
 class SignUpController extends GetxController {
 
   final formKey = GlobalKey<FormState>();
 
   static GraphQLConfig graphQLConfig = GraphQLConfig();
-  GraphQLClient client = graphQLConfig.clientToQuery();
+  GraphQLClient client = graphQLConfig.clientToLoginOrSignUp();
 
   //List of roles
   final List<String> _dropdownItems = ['Administrador', 'Cliente', 'Técnico'];

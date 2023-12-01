@@ -80,6 +80,7 @@ class LogInScreen  extends StatelessWidget {
                     isPassword: true,
                     validator: (value) => controller.validatePassword(value),
                     onChanged: (value) => controller.setPassword = value,
+                    maxLines: true,
                   ),
                   const SizedBox(height: 25,),
                   GetBuilder<LogInController>(

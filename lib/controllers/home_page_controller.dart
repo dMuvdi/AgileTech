@@ -1,4 +1,6 @@
+import 'package:agile_tech/controllers/login_controller.dart';
 import 'package:agile_tech/models/equipment.dart';
+import 'package:agile_tech/screens/login_screen.dart';
 import 'package:agile_tech/services/graphql_config.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -12,12 +14,18 @@ class HomePageController extends GetxController {
   List<Equipment> equipments = [];
 
   static GraphQLConfig graphQLConfig = GraphQLConfig();
-  GraphQLClient client = graphQLConfig.clientToQuery();
 
   @override
   void onInit() {
     super.onInit();
     getCredentials();
+  }
+
+  @override
+  void onReady() {
+    // TODO: implement onReady
+    super.onReady();
+    getEquipments();
   }
 
   void getCredentials() async {
@@ -34,35 +42,54 @@ class HomePageController extends GetxController {
     update();
   }
 
+  int getAmountOfEquipments(String category){
+    List<Equipment> equipmentCountList = equipments.where((equipment) => equipment.category == category).toList();
+    // Get the number of items in the filtered list
+    int equipmentCount = equipmentCountList.length;
+    return equipmentCount;
+  }
+
   Future<void> getEquipments() async {
-    final QueryOptions options = QueryOptions(
+    
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token')!;
+    
+    try{
+      GraphQLClient client = graphQLConfig.clientToQuery(token);
+      final QueryOptions options = QueryOptions(
       fetchPolicy: FetchPolicy.noCache,
-      document: gql("""
-          query GetEqupments{
-            getEquipments {
-              id
-              name
-              description
-              category
-              stock
-              imageUrl
-              reports {
-                code
+        document: gql("""
+            query GetEqupments{
+              getEquipments {
+                id
+                name
+                description
+                category
+                stock
+                imageUrl
               }
             }
-          }
-    """),
-    );
+      """),
+      );
+      final QueryResult result = await client.query(options);
+      
+      if (result.hasException){
+        print(result.exception);
+        Get.off(const LogInScreen(), transition: Transition.leftToRight);
+      }
 
-    final QueryResult result = await client.query(options);
-    
-    List? res = result.data?['getEquipments'];
+      List? res = result.data?['getEquipments'];
 
-    if (res == null || res.isEmpty){
-      equipments = [];
-    } else {
-      List<Equipment> equipments = res.map((equipment) => Equipment.fromMap(map: equipment)).toList();
-      this.equipments = equipments;
+      if (res == null || res.isEmpty){
+        equipments = [];
+      } else {
+        List<Equipment> equipments = res.map((equipment) => Equipment.fromMap(map: equipment)).toList();
+        this.equipments = equipments;
+      }
+      update();
+    } catch (e){
+      print(e);
+      Get.off(const LogInScreen(), transition: Transition.leftToRight);
     }
   }
 }

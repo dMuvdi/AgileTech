@@ -1,4 +1,5 @@
 import 'package:agile_tech/controllers/sign_up_controller.dart';
+import 'package:agile_tech/widgets/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:agile_tech/utils/gen/fonts.gen.dart';
 import 'package:get/get.dart';
@@ -105,54 +106,14 @@ class SignUpScreen  extends StatelessWidget {
                     validator: (value) => controller.validatePasswordReType(value),
                   ),
                   const SizedBox(height: 15,),
-                  Container(
-                    height: 50,
-                    width: double.infinity,
-                    padding: const EdgeInsets.only(left: 20.0, top: 7.0, bottom: 5.0, right: 10.0),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFE1E1),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        //color: _dropdownError == null ? Colors.transparent : Colors.red.shade700,
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    child: Obx(() {
-                        return DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            borderRadius: BorderRadius.circular(10),
-                            hint: const Text(
-                              'Rol',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF670F0F),
-                                fontFamily: FontFamilyToken.montserrat
-                              ),
-                            ),
-                            onChanged: (value) => controller.updateDropdownItem(value!),
-                            value: controller.currentRole.value,
-                            icon: const Icon(Icons.expand_more, color: Color(0xFF670F0F), size: 35,),
-                            items: controller.dropdownItems
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value, 
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF670F0F),
-                                    fontFamily: FontFamilyToken.montserrat
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            isExpanded: true,
-                          ),
-                        );
-                      }
-                    ),
-                  ),
+                  Obx(() {
+                    return CustomDropDown(
+                      hintText: 'Rol',
+                      items: controller.dropdownItems,
+                      onChanged: (value) => controller.updateDropdownItem(value!),
+                      value: controller.currentRole.value,
+                    );
+                  }),
                   const SizedBox(height: 25,),
                   GetBuilder<SignUpController>(
                     id: 'loading',

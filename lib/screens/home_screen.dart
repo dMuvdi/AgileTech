@@ -1,4 +1,5 @@
 import 'package:agile_tech/controllers/home_page_controller.dart';
+import 'package:agile_tech/screens/create_equipment_screen.dart';
 import 'package:agile_tech/utils/gen/fonts.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ class HomePage extends StatelessWidget {
       builder: (context) {
         return Scaffold(
           appBar: AppBar(
+            surfaceTintColor: Colors.transparent,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -43,16 +45,16 @@ class HomePage extends StatelessWidget {
                     )
                   ],
                 ),
-                IconButton(
+                controller.role == "Administrador" ? IconButton(
                   onPressed: () {
-                    
+                    Get.to(() => const CreateEquipmentScreen(), transition: Transition.rightToLeft);
                   },
                   icon: const Icon(
                     Icons.add,
                     color: Colors.white,
                     size: 30,
                   ),
-                )
+                ) :  const SizedBox()
               ],
             ),
             backgroundColor: const Color(0xFFFF5454),
@@ -106,34 +108,34 @@ class HomePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: const FittedBox(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: FittedBox(
                         child: Row(
                           children: [
                             Padding(
                               padding: EdgeInsets.all(8.0),
                               child: Column(
                                 children: [
-                                  Text('23', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 28, fontWeight: FontWeight.w700),),
-                                  Text('Total de equipos', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 10, fontWeight: FontWeight.w400),)
+                                  Text('${controller.equipments.length}', style: const TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 28, fontWeight: FontWeight.w700),),
+                                  const Text('Total de equipos', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 10, fontWeight: FontWeight.w400),)
                                 ],
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 children: [
-                                  Text('13', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 28, fontWeight: FontWeight.w700),),
-                                  Text('Total Mecánicos', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 10, fontWeight: FontWeight.w400),)
+                                  Text('${controller.getAmountOfEquipments('Mecánico')}', style: const TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 28, fontWeight: FontWeight.w700),),
+                                  const Text('Total Mecánicos', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 10, fontWeight: FontWeight.w400),)
                                 ],
                               ),
                             ), 
                             Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 children: [
-                                  Text('10', style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 28, fontWeight: FontWeight.w700),),
-                                  Text('Total Eléctricos',style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 10, fontWeight: FontWeight.w400),)
+                                  Text('${controller.getAmountOfEquipments('Eléctrico')}', style: const TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 28, fontWeight: FontWeight.w700),),
+                                  const Text('Total Eléctricos',style: TextStyle(fontFamily: FontFamilyToken.montserrat, fontSize: 10, fontWeight: FontWeight.w400),)
                                 ],
                               ),
                             )
@@ -146,55 +148,45 @@ class HomePage extends StatelessWidget {
                       'Añadidos recientemente',
                       style: TextStyle(
                         fontFamily: FontFamilyToken.montserrat,
-                        fontSize: 14,
+                        fontSize: 16,
                         color: Colors.grey,
-                        fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w600
                       ),
                     ),
                   ],
                 ),
               ),
               Align(
-                alignment: Alignment.bottomCenter,
+                alignment: controller.equipments.isEmpty ? Alignment.center : Alignment.bottomCenter,
                 child: SizedBox(
-                  width: double.infinity,
-                  height: 365,
-                  child: ListView.builder(
-                    itemCount: 3,
-                    itemBuilder: (context, index) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 25),
-                        child: EquipmentCard(
-                          name: 'Manguera Industrial', 
-                          category: 'Mecánico', 
-                          stock: 10,
-                          imageUrl: 'https://proveedorindustrialonline.com/wp-content/uploads/2020/11/manguera-industria.png'
-                        ),
-                      );
-                    }
+                  width: controller.equipments.isEmpty ?  30 : double.infinity,
+                  height: controller.equipments.isEmpty ?  30 : 365,
+                  child: controller.equipments.isEmpty ? 
+                  const CircularProgressIndicator(
+                    color: Color(0xFFFF5454),
+                  
+                  ) : 
+                  RefreshIndicator(
+                    onRefresh: () => controller.getEquipments(),
+                    child: ListView.builder(
+                      itemCount: controller.equipments.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
+                          child: EquipmentCard(
+                            name: controller.equipments[index].name, 
+                            category: controller.equipments[index].category, 
+                            stock: controller.equipments[index].stock.toInt(),
+                            imageUrl: controller.equipments[index].imageUrl!,
+                          ),
+                        );
+                      }
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          // body: GetBuilder<HomePageController>(
-          //   id: 'home',
-          //   builder: (context) {
-          //     return Column(
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: [
-          //         Text(
-          //           'Hello, ${controller.name}',
-          //           style: const TextStyle(fontSize: 18),
-          //         ),
-          //         Text(
-          //           'Token: ${controller.token}',
-          //           style: const TextStyle(fontSize: 18),
-          //         ),
-          //       ],
-          //     );
-          //   }
-          // ),
         );
       }
     );
