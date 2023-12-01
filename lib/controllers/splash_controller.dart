@@ -1,4 +1,3 @@
-import 'package:agile_tech/controllers/login_controller.dart';
 import 'package:agile_tech/screens/bottom_navigation.dart';
 import 'package:agile_tech/screens/login_screen.dart';
 import 'package:agile_tech/services/graphql_config.dart';

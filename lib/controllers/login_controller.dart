@@ -1,3 +1,4 @@
+import 'package:agile_tech/screens/profile_screen.dart';
 import 'package:agile_tech/screens/sign_up_screen.dart';
 import 'package:agile_tech/services/graphql_config.dart';
 import 'package:agile_tech/utils/gen/fonts.gen.dart';
@@ -135,7 +136,11 @@ class LogInController extends GetxController {
         print(token);
         storeToken(token!);
         isNotLoading();
-        Get.off(const BottomNavigation());
+        if(user.role == "ADMIN"){
+          Get.off(() => const BottomNavigation(), transition: Transition.fade);
+        } else {
+          Get.off(() => const ProfileScreen(), transition: Transition.fade);
+        }
       }
     }
   }

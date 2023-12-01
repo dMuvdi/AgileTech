@@ -1,5 +1,6 @@
 import 'package:agile_tech/models/user.dart';
 import 'package:agile_tech/screens/login_screen.dart';
+import 'package:agile_tech/screens/profile_screen.dart';
 import 'package:agile_tech/services/graphql_config.dart';
 import 'package:agile_tech/utils/gen/fonts.gen.dart';
 import 'package:flutter/material.dart';
@@ -114,6 +115,9 @@ class SignUpController extends GetxController {
 
   storeUser(String name, String lastName, String role) async {
     final prefs = await SharedPreferences.getInstance();
+    print(name);
+    print(lastName);
+    print(role);
     await prefs.setString('name', name);
     await prefs.setString('lastName', lastName);
     await prefs.setString('role', role);
@@ -178,6 +182,7 @@ class SignUpController extends GetxController {
             );
           }
         );
+        isNotLoading();
       } else {
         String? token = result.data!['signup']['token'];
         User user = User.fromMap(map: result.data!['signup']['user']);
@@ -185,7 +190,11 @@ class SignUpController extends GetxController {
         print(token);
         storeToken(token!);
         isNotLoading();
-        Get.off(const BottomNavigation());
+        if(user.role == "ADMIN"){
+          Get.off(() => const BottomNavigation(), transition: Transition.fade);
+        } else {
+          Get.off(() => const ProfileScreen(), transition: Transition.fade);
+        }
       }
     }
   }

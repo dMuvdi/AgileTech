@@ -97,6 +97,7 @@ class SignUpScreen  extends StatelessWidget {
                     isPassword: true,
                     validator: (value) => controller.validatePassword(value),
                     onChanged: (value) => controller.setPassword = value,
+                    maxLines: true,
                   ),
                   const SizedBox(height: 15,),
                   CustomTextField(
@@ -104,6 +105,7 @@ class SignUpScreen  extends StatelessWidget {
                     type: TextInputType.visiblePassword, 
                     isPassword: true,
                     validator: (value) => controller.validatePasswordReType(value),
+                    maxLines: true,
                   ),
                   const SizedBox(height: 15,),
                   Obx(() {

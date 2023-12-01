@@ -1,4 +1,3 @@
-import 'package:agile_tech/controllers/login_controller.dart';
 import 'package:agile_tech/models/equipment.dart';
 import 'package:agile_tech/screens/login_screen.dart';
 import 'package:agile_tech/services/graphql_config.dart';
@@ -32,9 +31,12 @@ class HomePageController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token')!;
     name = prefs.getString('name')!;
-    if (prefs.getString('role')! == 'ADMIN'){
+    print(name);
+    role = prefs.getString('role')!;
+    print(role);
+    if (role == 'ADMIN'){
       role = 'Administrador';
-    } else if (prefs.getString('role')! == 'TECHNICIAN'){
+    } else if (role == 'TECHNICIAN'){
       role = 'Técnico';
     } else {
       role = 'Cliente';

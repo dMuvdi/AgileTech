@@ -1,4 +1,3 @@
-import 'package:agile_tech/screens/bottom_navigation.dart';
 import 'package:agile_tech/services/graphql_config.dart';
 import 'package:agile_tech/utils/gen/fonts.gen.dart';
 import 'package:flutter/material.dart';
@@ -141,32 +140,8 @@ class CreateEquipmentController extends GetxController{
         );
         isNotLoading();
       } else {
-        showDialog(
-          context: Get.context!, 
-          builder: (context){
-            return const SimpleDialog(
-              backgroundColor:Color(0xFFFFE1E1),
-              title: Text(
-                "Registro exitoso", 
-                style: TextStyle(
-                  color: Color(0xFF670F0F), 
-                  fontFamily: FontFamilyToken.montserrat, 
-                  fontSize: 20),
-                ),
-              children: [
-                Text(
-                  "El equipo se ha registrado exitosamente", 
-                  style: TextStyle(
-                    color: Color(0xFF670F0F), 
-                    fontFamily: FontFamilyToken.montserrat,
-                     fontSize: 14),
-                )
-              ],
-            );
-          }
-        );
         isNotLoading();
-        Get.off(const BottomNavigation());
+        Get.back();
       }
     }
   }
