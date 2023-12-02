@@ -1,9 +1,15 @@
+import 'dart:io';
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:agile_tech/services/graphql_config.dart';
 import 'package:agile_tech/utils/gen/fonts.gen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 class CreateEquipmentController extends GetxController{
   //List of roles
@@ -12,19 +18,20 @@ class CreateEquipmentController extends GetxController{
   final formKey = GlobalKey<FormState>();
 
   static GraphQLConfig graphQLConfig = GraphQLConfig();
+
+  final cloudinary = CloudinaryPublic('dgi3u8chm', 'xg3gxg9w', cache: false);
   
   String token = "";
   String? _name;
   String? _description;
   int? _stock;
-  String _imageUrl = 'no image';
+  File? imageFile;
   final RxString currentCategory = 'Mecánico'.obs;
   bool loading = false;
   
   String? get name => _name;
   String? get description => _description;
   int? get stock => _stock;
-  String get imageUrl => _imageUrl;
   List<String> get dropdownItems => _dropdownItems;
   
   set setName(String value){
@@ -36,15 +43,16 @@ class CreateEquipmentController extends GetxController{
   }
 
   set setStock(String value){
-    _stock = int.parse(value);
+    if (value.isNotEmpty){
+      _stock = int.parse(value);
+    }else {
+      _stock = 0;
+    }
+    
   }
 
   void updateDropdownItem(String value){
     currentCategory.value = value;
-  }
-
-  void getImageUrl(String url){
-    _imageUrl = url;
   }
 
   validateName(String? value){
@@ -73,14 +81,43 @@ class CreateEquipmentController extends GetxController{
     update(['loading']);
   }
 
-  Future<void> onSubmit() async {
+  Future pickImage() async {
+    try{
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if(image == null) return;
 
+      final imageTemporary = File(image.path);
+      imageFile = imageTemporary;
+      update();
+    } on PlatformException catch(e){
+      debugPrint('Error: $e');
+    } 
+  }
+
+  Future<String> _uploadImage() async {
+    print(imageFile!.path);
+    if (imageFile != null){
+      try {
+        CloudinaryResponse response = await cloudinary.uploadFile(
+          CloudinaryFile.fromFile(imageFile!.path, resourceType: CloudinaryResourceType.Image),
+        );
+        return response.secureUrl;
+      } on CloudinaryException catch (e) {
+        debugPrint(e.message);
+        debugPrint(e.request as String?);
+      }
+    }
+    return 'no image';
+  }
+
+  Future<void> onSubmit() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token')!;
     GraphQLClient client = graphQLConfig.clientToQuery(token);
-    
     if(formKey.currentState!.validate()){
       isLoading();
+      String imgUrl = await _uploadImage();
+      print(imgUrl);
       final MutationOptions options = MutationOptions(
         fetchPolicy: FetchPolicy.noCache,
         document: gql("""
@@ -102,13 +139,11 @@ class CreateEquipmentController extends GetxController{
           'description': _description,
           'category': currentCategory.value,
           'stock': _stock,
-          'imageUrl': _imageUrl,
+          'imageUrl': imgUrl,
         },
       );
 
       final QueryResult result = await client.mutate(options);
-
-      print(result.data);
 
       if(result.data == null){
         showDialog(

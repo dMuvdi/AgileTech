@@ -59,6 +59,8 @@ class SplashController extends GetxController {
     String? password = prefs.getString('password');
     String? token = prefs.getString('token');
 
+    print(token);
+
     if(email != null && password != null && token != null){
       reLogin(email, password);
       Get.off(() => const BottomNavigation(), transition: Transition.fade);
