@@ -51,28 +51,33 @@ class EquipmentCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        color: Color(0xFF1E1E1E),
-                        fontFamily: FontFamilyToken.montserrat,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
+                SizedBox(
+                  width: 210,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: const TextStyle(
+                          color: Color(0xFF1E1E1E),
+                          fontFamily: FontFamilyToken.montserrat,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                    Text(
-                      category,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontFamily: FontFamilyToken.montserrat,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    )
-                  ],
+                      Text(
+                        category,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontFamily: FontFamilyToken.montserrat,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,

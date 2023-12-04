@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../widgets/equipment_card.dart';
+import 'equipment_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -173,11 +174,16 @@ class HomePage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
-                          child: EquipmentCard(
-                            name: controller.equipments[index].name, 
-                            category: controller.equipments[index].category, 
-                            stock: controller.equipments[index].stock.toInt(),
-                            imageUrl: controller.equipments[index].imageUrl!,
+                          child: GestureDetector(
+                            onTap: (){
+                              Get.to(() => const EquipmentScreen(), transition: Transition.fadeIn, arguments: controller.equipments[index].id);
+                            },
+                            child: EquipmentCard(
+                              name: controller.equipments[index].name, 
+                              category: controller.equipments[index].category, 
+                              stock: controller.equipments[index].stock.toInt(),
+                              imageUrl: controller.equipments[index].imageUrl!,
+                            ),
                           ),
                         );
                       }

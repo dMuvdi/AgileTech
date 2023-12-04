@@ -136,26 +136,6 @@ class CreateEquipmentScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 10,),
-                            TextButton(
-                              onPressed: () async {
-                                
-                              },
-                              style: ButtonStyle(
-                                overlayColor: MaterialStateProperty.all(Colors.white),
-                                backgroundColor: MaterialStateProperty.all(const Color(0xFFFFE1E1)),
-                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))),
-                                fixedSize: MaterialStateProperty.all(const Size(400, 54)),
-                              ), 
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add, color: Color(0xFF670F0F),),
-                                  SizedBox(width: 5,),
-                                  Text('Añadir reporte', style: TextStyle(color: Color(0xFF670F0F), fontFamily: 'Montserrat', fontWeight: FontWeight.w700, fontSize: 14),),
-                                ],
-                              ),
-                            ),
                             const SizedBox(height: 130,),
                             Align(
                               alignment: Alignment.bottomCenter,
