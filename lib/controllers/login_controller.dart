@@ -66,13 +66,15 @@ class LogInController extends GetxController {
     await prefs.setString('token', token);
   }
 
-  storeUser(String name, String lastName, String role, String mail, String pwd) async {
+  storeUser(String id, String name, String lastName, String role, String mail, String pwd) async {
     final prefs = await SharedPreferences.getInstance();
+    prefs.setString('id', id);
     prefs.setString('name', name);
     prefs.setString('lastName', lastName);
     prefs.setString('role', role);
     prefs.setString('email', mail);
     prefs.setString('password', pwd);
+    update();
   }
 
   Future<void> onLogin() async {
@@ -89,6 +91,7 @@ class LogInController extends GetxController {
               }) {
                 token
                 user{
+                  id
                   name
                   lastName
                   role
@@ -132,10 +135,12 @@ class LogInController extends GetxController {
       } else {
         String? token = result.data!['login']['token'];
         User user = User.fromMap(map: result.data!['login']['user']);
-        storeUser(user.name, user.lastName, user.role, _email!, _password!);
+        storeUser(user.id!, user.name, user.lastName, user.role, _email!, _password!);
         print(token);
+        print(user.name);
         storeToken(token!);
         isNotLoading();
+        update();
         if(user.role == "ADMIN"){
           Get.off(() => const BottomNavigation(), transition: Transition.fade);
         } else {

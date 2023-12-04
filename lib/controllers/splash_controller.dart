@@ -1,5 +1,6 @@
 import 'package:agile_tech/screens/bottom_navigation.dart';
 import 'package:agile_tech/screens/login_screen.dart';
+import 'package:agile_tech/screens/profile_screen.dart';
 import 'package:agile_tech/services/graphql_config.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -58,12 +59,18 @@ class SplashController extends GetxController {
     String? email = prefs.getString('email');
     String? password = prefs.getString('password');
     String? token = prefs.getString('token');
+    String? role = prefs.getString('role');
 
     print(token);
 
     if(email != null && password != null && token != null){
       reLogin(email, password);
-      Get.off(() => const BottomNavigation(), transition: Transition.fade);
+      if(role == "ADMIN"){
+        Get.off(() => const BottomNavigation(), transition: Transition.fade);
+      } else {
+        Get.off(() => const ProfileScreen(), transition: Transition.fade);
+      }
+      
     } else {
       Get.off(() => const LogInScreen(), transition: Transition.fade);
     }

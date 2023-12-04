@@ -5,6 +5,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/equipment.dart';
+import '../models/report.dart';
 import '../services/graphql_config.dart';
 
 class EquipmentController extends GetxController {
@@ -15,24 +16,38 @@ class EquipmentController extends GetxController {
 
   Equipment? equipment = Get.arguments;
 
+  List<Report> reports = [];
+
   bool loading = false;
+  bool loadingReports = false;
 
   @override
   onInit() async {
     super.onInit();
     debugPrint(equipment!.id);
     await getEquipment();
+    await getReports();
     update();
   }
 
   void isLoading(){
     loading = true;
-    update(['loading']);
+    update();
+  }
+
+  void isLoadingReports(){
+    loadingReports = true;
+    update();
+  }
+
+  void isNotLoadingReports(){
+    loadingReports = false;
+    update();
   }
 
   void isNotLoading(){
     loading = false;
-    update(['loading']);
+    update();
   }
 
   Future<void> deleteEquipment() async {
@@ -132,6 +147,58 @@ class EquipmentController extends GetxController {
     }
   }
 
+  Future<void> getReports() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token')!;
+    
+    try{
+      isLoadingReports();
+      GraphQLClient client = graphQLConfig.clientToQuery(token);
+      final QueryOptions options = QueryOptions(
+      fetchPolicy: FetchPolicy.noCache,
+        document: gql("""
+            query GetEquipment(\$id: String!){
+            getEquipment(id:\$id){
+              error
+              ok
+              equipment{
+                reports{
+                  id
+                  code
+                  description
+                  createdAt
+                }
+              }
+            }
+          }
+      """),
+        variables: {
+          'id': equipment!.id,
+        }
+      );
+      final QueryResult result = await client.query(options);
+      
+      if (result.hasException){
+        print(result.exception);
+      }
+
+      List? res = result.data?['getEquipment']['equipment']['reports'];
+      print(res);
+
+      if (res == null || res.isEmpty){
+        reports = [];
+      } else {
+        List<Report> reports = res.map((report) => Report.fromMap(map: report)).toList();
+        print(reports);
+        this.reports = reports;
+        isNotLoadingReports();
+        update();
+      }
+    } catch (e){
+      print(e);
+    }
+  }
+
   Future<void> getEquipment() async {
     
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -180,5 +247,4 @@ class EquipmentController extends GetxController {
       print(e);
     }
   }
-  
 }

@@ -27,10 +27,6 @@ class SignUpController extends GetxController {
   final RxString currentRole = 'Cliente'.obs;
   bool loading = false;
   
-  String? get name => _name;
-  String? get lastName => _lastName;
-  String? get email => _email;
-  String? get password => _password;
   List<String> get dropdownItems => _dropdownItems;
 
   String get role {
@@ -113,14 +109,16 @@ class SignUpController extends GetxController {
     await prefs.setString('token', token);
   }
 
-  storeUser(String name, String lastName, String role) async {
+  storeUser(String name, String lastName, String role, String email) async {
     final prefs = await SharedPreferences.getInstance();
     print(name);
     print(lastName);
     print(role);
+    print(email);
     await prefs.setString('name', name);
     await prefs.setString('lastName', lastName);
     await prefs.setString('role', role);
+    await prefs.setString('email', email);
   }
 
   Future<void> onSignUp() async {
@@ -186,7 +184,7 @@ class SignUpController extends GetxController {
       } else {
         String? token = result.data!['signup']['token'];
         User user = User.fromMap(map: result.data!['signup']['user']);
-        storeUser(user.name, user.lastName, user.role);
+        storeUser(user.name, user.lastName, user.role, user.email!);
         print(token);
         storeToken(token!);
         isNotLoading();

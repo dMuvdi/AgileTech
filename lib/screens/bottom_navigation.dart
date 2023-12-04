@@ -1,7 +1,6 @@
 import 'package:agile_tech/controllers/bottom_navigation_controller.dart';
 import 'package:agile_tech/screens/home_screen.dart';
 import 'package:agile_tech/screens/profile_screen.dart';
-import 'package:agile_tech/screens/reports_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +19,6 @@ class BottomNavigation extends StatelessWidget {
             index: controller.tabIndex,
             children: const [
               HomePage(),
-              ReportsScreen(),
               ProfileScreen()
             ],
           ),
@@ -36,10 +34,6 @@ class BottomNavigation extends StatelessWidget {
               BottomNavigationBarItem(
                 icon: Icon(Icons.construction),
                 label: 'Equipos',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.edit_note),
-                label: 'Reportes',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_2_rounded),
