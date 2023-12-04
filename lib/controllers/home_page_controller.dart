@@ -18,13 +18,8 @@ class HomePageController extends GetxController {
   void onInit() {
     super.onInit();
     getCredentials();
-  }
-
-  @override
-  void onReady() {
-    // TODO: implement onReady
-    super.onReady();
     getEquipments();
+    update();
   }
 
   void getCredentials() async {

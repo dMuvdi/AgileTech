@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/equipment_controller.dart';
+import 'bottom_navigation.dart';
 
 class EquipmentScreen extends StatelessWidget {
   const EquipmentScreen({super.key});
@@ -128,7 +129,10 @@ class EquipmentScreen extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 centerTitle: true,
                 leading: IconButton(
-                  onPressed: () { Get.back(); },
+                  onPressed: () { 
+                    controller.equipment = null;
+                    Get.off(() => const BottomNavigation(), transition: Transition.leftToRight); 
+                  },
                   icon: const Icon(
                     Icons.arrow_back_ios_new,
                     color: Colors.white,
@@ -139,30 +143,63 @@ class EquipmentScreen extends StatelessWidget {
                 alignment: Alignment.bottomCenter, 
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: TextButton(
-                    onPressed: () {
-                      Get.to(() => const CreateEquipmentScreen(), transition: Transition.rightToLeftWithFade, duration: const Duration(milliseconds: 500));
-                    },
-                    style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(const Color(0xFF670F0F)),
-                      backgroundColor: MaterialStateProperty.all(const Color(0xFFFF5454)),
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))),
-                      fixedSize: MaterialStateProperty.all(const Size(400, 54)),
-                    ), 
-                    child: const Text(
-                      'Actualizar',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Get.to(() => const CreateEquipmentScreen(), transition: Transition.rightToLeftWithFade, duration: const Duration(milliseconds: 500), arguments: controller.equipment!);
+                          controller.equipment = null;
+                        },
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateProperty.all(Color.fromARGB(255, 250, 181, 181)),
+                          backgroundColor: MaterialStateProperty.all(const Color(0xFFFFE1E1)),
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))),
+                          fixedSize: MaterialStateProperty.all(const Size(400, 54)),
+                        ), 
+                        child: const Text(
+                          'Actualizar',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF670F0F),
+                          ),
+                        )
                       ),
-                    )
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () async {
+                          await controller.deleteEquipment();
+                        },
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateProperty.all(const Color(0xFF670F0F)),
+                          backgroundColor: MaterialStateProperty.all(const Color(0xFFFF5454)),
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))),
+                          fixedSize: MaterialStateProperty.all(const Size(400, 54)),
+                        ), 
+                        child: controller.loading == false ? const Text(
+                          'Eliminar',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ) : const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            backgroundColor: Color(0xFF670F0F),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-        ): Scaffold(backgroundColor: Colors.white, body: const Center(child: CircularProgressIndicator(color: Color(0xFFFF5454),)));
+        ): const Scaffold(backgroundColor: Colors.white, body: Center(child: CircularProgressIndicator(color: Color(0xFFFF5454),)));
       }
     );
   }

@@ -20,6 +20,7 @@ class HomePage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             surfaceTintColor: Colors.transparent,
+            automaticallyImplyLeading: false,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -176,7 +177,7 @@ class HomePage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
                           child: GestureDetector(
                             onTap: (){
-                              Get.to(() => const EquipmentScreen(), transition: Transition.fadeIn, arguments: controller.equipments[index].id);
+                              Get.to(() => const EquipmentScreen(), transition: Transition.fadeIn, arguments: controller.equipments[index]);
                             },
                             child: EquipmentCard(
                               name: controller.equipments[index].name, 

@@ -9,6 +9,8 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/equipment.dart';
+
 
 
 class CreateEquipmentController extends GetxController{
@@ -20,14 +22,17 @@ class CreateEquipmentController extends GetxController{
   static GraphQLConfig graphQLConfig = GraphQLConfig();
 
   final cloudinary = CloudinaryPublic('dgi3u8chm', 'xg3gxg9w', cache: false);
+
+  Equipment? equipment = Get.arguments;
   
   String token = "";
   String? _name;
   String? _description;
   int? _stock;
   File? imageFile;
-  final RxString currentCategory = 'Mecánico'.obs;
+  late RxString currentCategory = equipment == null ? 'Mecánico'.obs : equipment!.category.obs;
   bool loading = false;
+  bool newImage = false;
   
   String? get name => _name;
   String? get description => _description;
@@ -48,7 +53,6 @@ class CreateEquipmentController extends GetxController{
     }else {
       _stock = 0;
     }
-    
   }
 
   void updateDropdownItem(String value){
@@ -82,6 +86,7 @@ class CreateEquipmentController extends GetxController{
   }
 
   Future pickImage() async {
+    newImage = true;
     try{
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if(image == null) return;
@@ -108,6 +113,114 @@ class CreateEquipmentController extends GetxController{
       }
     }
     return 'no image';
+  }
+
+  Future<void> onSubmitUpdate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token')!;
+    GraphQLClient client = graphQLConfig.clientToQuery(token);
+    isLoading();
+    String? imgUrl = newImage ? await _uploadImage() : equipment!.imageUrl;
+    print(imgUrl);
+    final MutationOptions options = MutationOptions(
+      fetchPolicy: FetchPolicy.noCache,
+      document: gql("""
+          mutation UpdateEquipment(\$name: String, \$description: String, \$category: String, \$stock: Int, \$imageUrl: String, \$id: ID!) {
+          updateEquipment(
+            input:{
+              name: \$name,
+              description: \$description,
+              category: \$category,
+              stock: \$stock,
+              imageUrl: \$imageUrl,
+              id: \$id,  
+            }
+          ) {
+            ok
+            error
+            equipment{
+              name
+            }
+          }
+        }
+    """),
+    variables: {
+        'name': _name ?? equipment!.name,
+        'description': _description ?? equipment!.description,
+        'category': currentCategory.value,
+        'stock': _stock ?? equipment!.stock,
+        'imageUrl': imgUrl,
+        'id': equipment!.id,
+      },
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    print(result.data);
+
+    if(result.data == null){
+      showDialog(
+        context: Get.context!, 
+        builder: (context){
+          return const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: SimpleDialog(
+              backgroundColor:Color(0xFFFFE1E1),
+              title: Text(
+                "Error de actualización", 
+                style: TextStyle(
+                  color: Color(0xFF670F0F), 
+                  fontFamily: FontFamilyToken.montserrat, 
+                  fontSize: 20),
+                ),
+              children: [
+                Text(
+                  "Porfavor intentelo nuevamente", 
+                  style: TextStyle(
+                    color: Color(0xFF670F0F), 
+                    fontFamily: FontFamilyToken.montserrat,
+                      fontSize: 14),
+                )
+              ],
+            ),
+          );
+        }
+      );
+      isNotLoading();
+    } else{
+      Get.back();
+      showDialog(
+        context: Get.context!, 
+        builder: (context){
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: SimpleDialog(
+              backgroundColor:const Color(0xFFFFE1E1),
+              title: const Text(
+                "Actualizado con éxito", 
+                style: TextStyle(
+                  color: Color(0xFF670F0F), 
+                  fontFamily: FontFamilyToken.montserrat, 
+                  fontSize: 20),
+                ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "El equipo ${result.data?['updateEquipment']['equipment']['name']} ha sido actualizado con éxito", 
+                    style: const TextStyle(
+                      color: Color(0xFF670F0F), 
+                      fontFamily: FontFamilyToken.montserrat,
+                        fontSize: 14),
+                  ),
+                )
+              ],
+            ),
+          );
+        }
+      );
+      isNotLoading();
+    }
   }
 
   Future<void> onSubmit() async {
