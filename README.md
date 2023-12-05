@@ -25,3 +25,5 @@ ipconfig
 ```
 
 After that just select the option that says "IPv4 Address". Once you have that the project should run succesfully on your emulator or physical phone!
+
+#### Notice that to see the complete UI in usage you'll need to sign up as administrator, because of user restrctions based on the nature of the project.
