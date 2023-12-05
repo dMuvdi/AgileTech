@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../controllers/equipment_controller.dart';
 import 'bottom_navigation.dart';
+import 'create_report_screen.dart';
 
 class EquipmentScreen extends StatelessWidget {
   const EquipmentScreen({super.key});
@@ -164,17 +165,44 @@ class EquipmentScreen extends StatelessWidget {
                               //physics: const NeverScrollableScrollPhysics(),
                               itemCount: controller.reports.length,
                               itemBuilder: (context, index){
-                                return ListTile(
-                                  title: Row(
-                                    children: [
-                                      Text('${controller.reports[index].code} - '),
-                                      Text(DateFormat('MMM dd y').format(controller.reports[index].createdAt)),
-                                    ],
+                                return GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => const CreateReportScreen(), arguments: controller.reports[index], transition: Transition.rightToLeftWithFade, duration: const Duration(milliseconds: 500));
+                                    controller.equipment = null;
+                                  },
+                                  child: ListTile(
+                                    title: Row(
+                                      children: [
+                                        Text('${controller.reports[index].code} - '),
+                                        Text(DateFormat('MMM dd y').format(controller.reports[index].createdAt)),
+                                      ],
+                                    ),
+                                    subtitle: Text(controller.reports[index].description),
+                                    leading: const Icon(Icons.report_problem, color: Color(0xFF670F0F),),
                                   ),
-                                  subtitle: Text(controller.reports[index].description),
-                                  leading: const Icon(Icons.report_problem, color: Color(0xFF670F0F),),
                                 );
                               },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextButton(
+                            onPressed: () {
+                              Get.to(() => const CreateReportScreen(), arguments: controller.equipment!.id, transition: Transition.rightToLeftWithFade, duration: const Duration(milliseconds: 500));
+                              controller.equipment = null;
+                            },
+                            style: ButtonStyle(
+                              overlayColor: MaterialStateProperty.all(Colors.white),
+                              backgroundColor: MaterialStateProperty.all(const Color(0xFFFFE1E1)),
+                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))),
+                              fixedSize: MaterialStateProperty.all(const Size(400, 54)),
+                            ), 
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add, color: Color(0xFF670F0F),),
+                                SizedBox(width: 5,),
+                                Text('Añadir reporte', style: TextStyle(color: Color(0xFF670F0F), fontFamily: 'Montserrat', fontWeight: FontWeight.w700, fontSize: 14),),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -184,7 +212,7 @@ class EquipmentScreen extends StatelessWidget {
                               controller.equipment = null;
                             },
                             style: ButtonStyle(
-                              overlayColor: MaterialStateProperty.all(Color.fromARGB(255, 250, 181, 181)),
+                              overlayColor: MaterialStateProperty.all(const Color.fromARGB(255, 250, 181, 181)),
                               backgroundColor: MaterialStateProperty.all(const Color(0xFFFFE1E1)),
                               shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))),
                               fixedSize: MaterialStateProperty.all(const Size(400, 54)),

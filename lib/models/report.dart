@@ -1,6 +1,3 @@
-import 'package:agile_tech/models/equipment.dart';
-import 'package:agile_tech/models/user.dart';
-
 class Report {
   final String? id;
   final DateTime createdAt;
@@ -8,8 +5,8 @@ class Report {
   final DateTime? deletedAt;
   final String code;
   final String description;
-  final Equipment? equipment;
-  final User? user;
+  final String? equipmentId;
+  final String? userId;
 
   Report({
     this.id, 
@@ -18,8 +15,8 @@ class Report {
     this.deletedAt,
     required this.code,
     required this.description,
-    this.equipment,
-    this.user
+    this.equipmentId,
+    this.userId
   });
   
   static Report fromMap({required Map map}) => Report(

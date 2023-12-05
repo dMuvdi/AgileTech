@@ -17,7 +17,7 @@ class SplashController extends GetxController {
     startApp();
   }
 
-  reLogin(String email, String password) async {
+  Future<void> reLogin(String email, String password) async {
     final MutationOptions options = MutationOptions(
         fetchPolicy: FetchPolicy.noCache,
         document: gql("""
@@ -70,7 +70,6 @@ class SplashController extends GetxController {
       } else {
         Get.off(() => const ProfileScreen(), transition: Transition.fade);
       }
-      
     } else {
       Get.off(() => const LogInScreen(), transition: Transition.fade);
     }
